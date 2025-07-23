@@ -23,7 +23,7 @@ if page == "Overview":
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     kpi1.metric("Total Sales", f"{filtered_df['Total_sales'].sum():,.0f}")
     kpi2.metric("Avg. Luxury Sales", f"{filtered_df['luxury_sales'].mean():.2f}")
-    kpi3.metric("Unique Customers", f"{filtered_df['customer_ID'].nunique()}")
+    kpi3.metric("Unique Customers", f"{filtered_df['Customer_ID'].nunique()}")
     kpi4.metric("Most Common Cluster", filtered_df['cluster_name'].mode()[0])
 
     # Charts
