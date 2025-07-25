@@ -89,13 +89,76 @@ def load_data():
     """Load and cache the supermarket dataset"""
     try:
         df = pd.read_csv(DATASET_FILENAME)
+        
+        # Check if the required columns exist and fix column names if needed
+        expected_columns = ['Customer_ID', 'outlet_city', 'luxury_sales', 'fresh_sales', 
+                          'dry_sales', 'cluster_name', 'Total_sales']
+        
+        # Handle the cluster_category vs cluster_catgeory naming issue
+        if 'cluster_category' in df.columns and 'cluster_catgeory' not in df.columns:
+            df = df.rename(columns={'cluster_category': 'cluster_catgeory'})
+        elif 'cluster_catgeory' not in df.columns and 'cluster_category' not in df.columns:
+            st.error("Column 'cluster_catgeory' or 'cluster_category' not found in dataset!")
+            st.error(f"Available columns: {list(df.columns)}")
+            st.stop()
+        
+        # Verify all required columns exist
+        missing_columns = []
+        for col in expected_columns:
+            if col not in df.columns:
+                missing_columns.append(col)
+        
+        if 'cluster_catgeory' not in df.columns:
+            missing_columns.append('cluster_catgeory')
+            
+        if missing_columns:
+            st.error(f"Missing required columns: {missing_columns}")
+            st.error(f"Available columns in your dataset: {list(df.columns)}")
+            st.stop()
+            
         return df
+        
     except FileNotFoundError:
-        st.error(f"Dataset file '{DATASET_FILENAME}' not found! Please update the filename at the top of the code.")
-        st.stop()
+        st.error(f"❌ Dataset file '{DATASET_FILENAME}' not found!")
+        st.info("📝 Please ensure your CSV file is:")
+        st.info("1. Located in the same directory as this script")
+        st.info("2. Named correctly in the DATASET_FILENAME variable")
+        st.info("3. Uploaded to your deployment platform if using cloud hosting")
+        
+        # Provide file upload option as fallback
+        st.subheader("📤 Upload your dataset instead:")
+        uploaded_file = st.file_uploader("Choose your CSV file", type="csv")
+        if uploaded_file is not None:
+            try:
+                df = pd.read_csv(uploaded_file)
+                # Apply the same column checks as above
+                if 'cluster_category' in df.columns and 'cluster_catgeory' not in df.columns:
+                    df = df.rename(columns={'cluster_category': 'cluster_catgeory'})
+                return df
+            except Exception as e:
+                st.error(f"Error reading uploaded file: {str(e)}")
+                st.stop()
+        else:
+            st.stop()
+            
     except Exception as e:
-        st.error(f"Error loading dataset: {str(e)}")
-        st.stop()
+        st.error(f"❌ Error loading dataset: {str(e)}")
+        st.error("🔍 Please check your dataset format and column names")
+        
+        # Show file upload option as fallback
+        st.subheader("📤 Try uploading your dataset:")
+        uploaded_file = st.file_uploader("Choose your CSV file", type="csv")
+        if uploaded_file is not None:
+            try:
+                df = pd.read_csv(uploaded_file)
+                if 'cluster_category' in df.columns and 'cluster_catgeory' not in df.columns:
+                    df = df.rename(columns={'cluster_category': 'cluster_catgeory'})
+                return df
+            except Exception as e:
+                st.error(f"Error reading uploaded file: {str(e)}")
+                st.stop()
+        else:
+            st.stop()
 
 def create_hero_metrics(df):
     """Create stunning hero metrics for supermarket chain"""
