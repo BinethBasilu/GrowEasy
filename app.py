@@ -324,6 +324,7 @@ def main():
         """,
         unsafe_allow_html=True
     )
+    
 def create_hero_metrics(df):
     """Create stunning hero metrics for supermarket chain"""
     total_revenue = df['Total_sales'].sum()
@@ -894,7 +895,8 @@ def create_performance_metrics_table(df):
     for col in currency_cols:
         city_metrics[col] = city_metrics[col].apply(lambda x: f"LKR {x:,.0f}")
     
-    return city_metrics.sort_values('City')    
+    return city_metrics.sort_values('City')
+
 if __name__ == "__main__":
     main()
 def load_data():
